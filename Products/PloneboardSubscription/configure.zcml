@@ -1,0 +1,19 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:setup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    i18n_domain="Products.PloneboardSubscription">
+
+    <include package=".browser" />
+
+    <!-- Generic Setup profile -->
+    <setup:registerProfile
+        name="default"
+        title="PloneboardSubscription"
+        directory="profiles/default"
+        description="The default settings for PloneboardSubscription"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+
+  
+</configure>

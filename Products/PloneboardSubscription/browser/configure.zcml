@@ -1,0 +1,59 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="Products.PloneboardSubscription">
+
+
+<browser:viewlet
+   name="plone.abovecontenttitle.documentactions"
+   for="Products.Ploneboard.content.PloneboardConversation.PloneboardConversation"
+   manager="plone.app.layout.viewlets.interfaces.IBelowContentBody"
+   template="subscribe.pt"
+   permission="zope2.View"
+  />
+
+<browser:viewlet
+   name="plone.abovecontenttitle.documentactions"
+   for="Products.Ploneboard.content.PloneboardForum.PloneboardForum"
+   manager="plone.app.layout.viewlets.interfaces.IBelowContentBody"
+   template="subscribe.pt"
+   permission="zope2.View"
+  />
+
+<browser:page
+    for="Products.Ploneboard.interfaces.IConversation"
+    name="subscribe"
+    class=".views.Subscribe"
+    permission="zope2.View"
+    />
+
+<browser:page
+    for="Products.Ploneboard.interfaces.IConversation"
+    name="unsubscribe"
+    class=".views.Unsubscribe"
+    permission="zope2.View"
+    />
+
+<browser:page
+    for="Products.Ploneboard.interfaces.IForum"
+    name="subscribe"
+    class=".views.Subscribe"
+    permission="zope2.View"
+    />
+
+<browser:page
+    for="Products.Ploneboard.interfaces.IForum"
+    name="unsubscribe"
+    class=".views.Unsubscribe"
+    permission="zope2.View"
+    />
+
+<!-- Item modification event handler -->
+<subscriber
+       for="Products.Ploneboard.interfaces.IComment
+            Products.Archetypes.interfaces.IObjectInitializedEvent"
+       handler=".events.onObjectEditedEvent"
+       />
+
+</configure>
+

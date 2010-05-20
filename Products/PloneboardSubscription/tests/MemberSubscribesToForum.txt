@@ -1,0 +1,146 @@
+Using a member-posting forum
+============================
+
+Test starting conversations, replying and modifying comments in a default
+member-posting forum.
+
+First, some set-up:
+
+    >>> from Products.Five import zcml
+    >>> import Products
+    >>> zcml.load_config('configure.zcml', package=Products.PloneboardSubscription)
+
+    >>> from Products.Ploneboard.tests import utils
+    >>> utils.setUpDefaultMembersBoardAndForum(self)
+
+
+Let us log all exceptions, which is useful for debugging. Also, clear portlet
+slots, to make the test browser less confused by things like the recent portlet
+and the navtree.
+
+    >>> workflow = self.portal.portal_workflow
+
+Verify that the forum is indeed a member-posting one by default and log in:
+
+    >>> workflow.getInfoFor(self.forum, 'review_state')
+    'memberposting'
+
+Using a member-posting forum
+============================
+
+    >>> browser = self.browser
+    >>> utils.logoutThenLoginAs(self, browser, 'member1')
+
+View forum
+----------
+
+The forum created behind the scenes should now be shown here.
+
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.contents
+    '...Forum 1...'
+
+If we go to the forum, there are no conversations shown.
+
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.contents
+    '...No conversations in this forum yet...'
+
+Look for Subscribe link
+-----------------------
+
+    >>> browser.getLink('Subscribe').click()
+
+Check the tool
+--------------
+
+    >>> len(self.portal.portal_pbnotification.subscribers.keys())
+        1
+
+    >>> self.portal.portal_pbnotification.subscribers.keys()[0]
+        '/plone/board1/forum1'
+
+    >>> self.portal.portal_pbnotification.subscribers.values()[0]
+        [u'member1']
+
+Add a new conversation
+----------------------
+
+Now we can add a new conversation. We set a title and some body text. The body
+text can contain HTML as well.
+
+    >>> browser.getControl('Start a new Conversation').click()
+    >>> browser.url
+    '.../add_conversation_form...'
+    >>> browser.getControl('Title').value = 'New title'
+    >>> browser.getControl('Body text').value = 'Some <b>body</b> text'
+
+Submit the form, and we should be returned to the forum view. The conversation
+should exist, and we should be able to view it.
+
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(self.forum.absolute_url())
+    True
+    >>> conversation = self.forum.getConversations()[0]
+
+    >>> import re
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
+
+This should have not triggered a notification because no need to alert the creator
+------------------------------------------------------------------------------------
+
+    >>> len(self.portal.MailHost.messages)
+    0
+
+Now go in as member2
+--------------------
+
+    >>> utils.logoutThenLoginAs(self, browser, 'member2')
+
+View forum
+----------
+
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.contents
+    '...Forum 1...'
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
+
+Then add a full reply.
+
+    >>> browser.getControl('Reply to this', index=0).click()
+    >>> browser.url
+    '.../add_comment_form...'
+    >>> browser.getControl(name='text').value
+    '...Previously Member one wrote:...<blockquote>Some <b>body</b> text</blockquote>...'
+    >>> browser.getControl(name='text').value = 'A full reply'
+
+Submit and make sure we go back to the conversation
+
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(conversation.absolute_url())
+    True
+    >>> browser.contents
+    '...A full reply...'
+
+Force the tool
+--------------
+
+    >>> self.portal.portal_pbnotification.process_pending()
+
+This should have triggered a notification. Check the MockMailHost
+------------------------------------------------------------------
+
+    >>> len(self.portal.MailHost.messages)
+    1
+
+    >>> self.portal.MailHost.messages[0]
+    'To: member1@example.com...'
+
+    >>> conversation.absolute_url() in self.portal.MailHost.messages[0]
+    True
+
+    >>> self.portal.MailHost.reset()
+
+    >>> len(self.portal.MailHost.messages)
+    0

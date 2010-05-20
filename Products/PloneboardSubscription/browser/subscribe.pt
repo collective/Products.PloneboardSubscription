@@ -1,0 +1,9 @@
+<tal:block define="tool nocall:here/portal_pbnotification;
+                   subs python:tool.checkSubscriber(context);">
+<tal:subscribe tal:condition="subs">
+    <a name="subscribe" tal:attributes="href string:${here/absolute_url}/unsubscribe">Unsubscribe</a>
+</tal:subscribe>
+<tal:unsubscribe tal:condition="not: subs">
+    <a name="subscribe" tal:attributes="href string:${here/absolute_url}/subscribe">Subscribe</a>
+</tal:unsubscribe>
+</tal:block>

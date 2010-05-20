@@ -1,0 +1,95 @@
+Test for mail template
+======================
+
+Test starting conversations, replying and modifying comments in a default
+member-posting forum.
+
+First, some set-up:
+
+    >>> from Products.Five import zcml
+    >>> import Products
+    >>> zcml.load_config('configure.zcml', package=Products.PloneboardSubscription)
+
+    >>> from Products.Ploneboard.tests import utils
+    >>> utils.setUpDefaultMembersBoardAndForum(self)
+
+    >>> new_mail_template = """Dear John:
+    ... This is a notification.
+    ...
+    ... [URLS]
+    ...
+    ... Your url is in the mail.
+    ... Thanks.
+    ...
+    ... Yours sincerley,
+    ... Webmaster""".split('\n')
+
+    >>> self.portal.portal_pbnotification.manage_changeProperties(mail_template=new_mail_template)
+    >>> new_mail_template == list(self.portal.portal_pbnotification.getProperty('mail_template'))
+    True
+
+    >>> browser = self.browser
+    >>> utils.logoutThenLoginAs(self, browser, 'member1')
+
+View forum
+----------
+
+The forum created behind the scenes should now be shown here.
+
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.contents
+    '...Forum 1...'
+
+If we go to the forum, there are no conversations shown.
+
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.contents
+    '...No conversations in this forum yet...'
+
+Look for Subscribe link
+-----------------------
+
+    >>> browser.getLink('Subscribe').click()
+
+Add a new conversation as member2
+----------------------------------
+
+Now we can add a new conversation. We set a title and some body text. The body
+text can contain HTML as well.
+
+    >>> utils.logoutThenLoginAs(self, browser, 'member2')
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.getControl('Start a new Conversation').click()
+    >>> browser.url
+    '.../add_conversation_form...'
+    >>> browser.getControl('Title').value = 'New title'
+    >>> browser.getControl('Body text').value = 'Some <b>body</b> text'
+
+Submit the form, and we should be returned to the forum view. The conversation
+should exist, and we should be able to view it.
+
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(self.forum.absolute_url())
+    True
+    >>> conversation = self.forum.getConversations()[0]
+
+    >>> import re
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
+
+This should have triggered a notification. Check the MockMailHost
+------------------------------------------------------------------
+
+    >>> len(self.portal.MailHost.messages)
+        1
+
+    >>> self.portal.MailHost.messages[0]
+    'To: member1@example.com...'
+
+    >>> conversation.absolute_url() in self.portal.MailHost.messages[0]
+    True
+
+    >>> s1 = [x for x in new_mail_template if x not in ['', '[URLS]']]
+    >>> s2 = [x for x in s1 if x in self.portal.MailHost.messages[0]]
+    >>> s1 == s2
+    True

@@ -9,6 +9,8 @@ First, some set-up:
     >>> from Products.Five import zcml
     >>> import Products
     >>> zcml.load_config('configure.zcml', package=Products.PloneboardSubscription)
+    >>> import Products.PloneboardSubscription
+    >>> zcml.load_config('configure.zcml', package=Products.PloneboardSubscription.browser)
 
     >>> from Products.Ploneboard.tests import utils
     >>> utils.setUpDefaultMembersBoardAndForum(self)

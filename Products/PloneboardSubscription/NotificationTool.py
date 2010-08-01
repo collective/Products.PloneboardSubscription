@@ -209,7 +209,7 @@ page after logging in.
                      address, message)
 
         n_messages_sent = 0
-        this_message = ('To: %s\n' % address) + message
+        this_message = ('From: admin@livemodern.com\nTo: %s\nSubject: Livemodern Forum Notification\n' % address) + message
         this_message = this_message.encode(encoding)
         try:
             mailhost.send(this_message)

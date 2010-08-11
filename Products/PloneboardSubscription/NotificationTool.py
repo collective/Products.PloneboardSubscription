@@ -48,7 +48,7 @@ class NotificationTool(UniqueObject, SimpleItem, PropertyManager):
     send_interval = 10
     last_sent = ''
 
-    mail_template = """Dear Plone portal Member:
+    mail_template = """Dear [PORTAL_TITLE] Member:
 
 There is new activity in the conversation(s) that you have subscribed to.
 Please follow the following link(s) to view the latest update:
@@ -159,19 +159,22 @@ page after logging in.
                     if conv_id not in notify[n1]:
                         notify[n1].append(conv_id)
         for n1 in notify:
-            email = self.getEmailAddress(n1)
+            email, fullname = self.getEmailAddress(n1)
             if email:
                 message = self.createMessage(notify[n1])
-                self.sendNotification(email, message)
+                self.sendNotification(email, fullname, message)
         
     def createMessage(self, conv):
         """Return email addresses of ``user``."""
         portal = getToolByName(self, 'portal_url').getPortalObject()
+        portal_title = portal.getProperty('title').split(':')[0]
         portal_id = '/' + portal.getId()
         urls = '\n'.join(['%s%s' % (portal.absolute_url(), c1.replace(portal_id, '')) for c1 in conv])
         msg = list(self.mail_template)
         for i in range(len(msg)):
-            if msg[i].startswith('[URLS]'):
+            if msg[i].find('[PORTAL_TITLE]') >= 0:
+                msg[i] = msg[i].replace('[PORTAL_TITLE]', portal_title)
+            elif msg[i].startswith('[URLS]'):
                 msg[i] = urls
         return '\n'.join(msg)
 
@@ -187,11 +190,12 @@ page after logging in.
         member = mtool.getMemberById(str(user))
         if member is not None:
             user = member.getProperty('email', '')
+            fullname = member.getProperty('fullname', '')
         if user and EMAIL_REGEXP.match(user):
-            return user
+            return user, fullname
         return None
 
-    def sendNotification(self, address, message):
+    def sendNotification(self, address, fullname, message):
         """Send ``message`` to all ``addresses``."""
         for m in MAIL_HOST_META_TYPES:
             mailhosts = self.superValues(m)
@@ -201,16 +205,25 @@ page after logging in.
         mailhost = mailhosts[0]
 
         ptool = getToolByName(self, 'portal_properties').site_properties
+        portal = getToolByName(self, 'portal_url').getPortalObject()
+        portal_title = portal.getProperty('title').split(':')[0]
+        email_from_name = portal.getProperty('email_from_name')
+        email_from_address = portal.getProperty('email_from_address')
         encoding = ptool.getProperty('default_charset', 'utf-8')
-        message = self.encodeMailHeaders(message, encoding)
+
+        n_messages_sent = 0
+        this_message = """From: %s <%s>
+To: %s <%s>
+Subject: %s Forum Notification
+%s
+""" % (email_from_name, email_from_address, fullname, address, portal_title, message)
+        this_message = self.encodeMailHeaders(this_message, encoding)
+        this_message = this_message.encode(encoding)
 
         if self.getProperty('debug_mode'):
             LOG.info('About to send this message to %s: \n%s',
-                     address, message)
+                     address, this_message)
 
-        n_messages_sent = 0
-        this_message = ('From: admin@livemodern.com\nTo: %s\nSubject: Livemodern Forum Notification\n' % address) + message
-        this_message = this_message.encode(encoding)
         try:
             mailhost.send(this_message)
             n_messages_sent += 1

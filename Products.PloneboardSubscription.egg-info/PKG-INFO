@@ -1,10 +1,10 @@
 Metadata-Version: 1.0
 Name: Products.PloneboardSubscription
-Version: 0.1
+Version: 0.2
 Summary: Enables email subscription to Ploneboard posts
-Home-page: http://svn.plone.org/svn/collective/
-Author: UNKNOWN
-Author-email: UNKNOWN
+Home-page: http://plone.org/products/products.ploneboardsubscription
+Author: Suresh V
+Author-email: suresh@grafware.com
 License: GPL
 Description: Introduction
         ============
@@ -21,6 +21,11 @@ Description: Introduction
         
         Changelog
         =========
+        
+        0.2 (2010-09-23)
+        ----------------
+        
+        - Bug fixes
         
         0.1 (2010-05-20)
         ----------------

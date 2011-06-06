@@ -140,6 +140,9 @@ page after logging in.
         for obj in self.pending:
             creator = obj.Creator()
             conv = obj.getConversation()
+            if not conv:
+                LOG.error('Comment: %s has no conv' % '/'.join(obj.getPhysicalPath()))
+                continue
             forum = conv.getForum()
             conv_id = self.getObjId(conv)
             forum_id = self.getObjId(forum)

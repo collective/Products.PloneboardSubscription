@@ -3,10 +3,10 @@
           condition="python: tool and not isAnon">
 <tal:block define="subs python:tool.checkSubscriber(context);">
 <tal:subscribe tal:condition="subs">
-    <a name="subscribe" tal:attributes="href string:${here/absolute_url}/unsubscribe">Unsubscribe</a>
+    <a name="subscribe" tal:attributes="href string:${here/absolute_url}/unsubscribe" i18n:domain="PloneboardSubscription" i18n:translate="">Unsubscribe</a>
 </tal:subscribe>
 <tal:unsubscribe tal:condition="not: subs">
-    <a name="subscribe" tal:attributes="href string:${here/absolute_url}/subscribe">Subscribe</a>
+    <a name="subscribe" tal:attributes="href string:${here/absolute_url}/subscribe" i18n:domain="PloneboardSubscription" i18n:translate="">Subscribe</a>
 </tal:unsubscribe>
 </tal:block>
 </tal:main>

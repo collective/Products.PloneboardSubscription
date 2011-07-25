@@ -2,9 +2,11 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:setup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
-    i18n_domain="Products.PloneboardSubscription">
+    i18n_domain="PloneboardSubscription">
 
     <include package=".browser" />
+
+    <i18n:registerTranslations directory="locales" />
 
     <!-- Generic Setup profile -->
     <setup:registerProfile

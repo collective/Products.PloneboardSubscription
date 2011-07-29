@@ -4,7 +4,8 @@ Changelog
 0.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fixed UnicodeDecodeError during notification if you put a message with non-ascii chars
+  [dmoro]
 
 
 0.2 (2010-09-23)

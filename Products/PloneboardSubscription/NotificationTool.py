@@ -215,11 +215,11 @@ page after logging in.
         encoding = ptool.getProperty('default_charset', 'utf-8')
 
         n_messages_sent = 0
-        this_message = """From: %s <%s>
+        this_message = u"""From: %s <%s>
 To: %s <%s>
 Subject: %s Forum Notification
 %s
-""" % (email_from_name, email_from_address, fullname, address, portal_title, message)
+""" % (email_from_name, email_from_address, fullname, address, portal_title.decode(encoding), message.decode(encoding))
         this_message = self.encodeMailHeaders(this_message, encoding)
         this_message = this_message.encode(encoding)
 

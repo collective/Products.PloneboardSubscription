@@ -7,6 +7,9 @@ Changelog
 - Fixed UnicodeDecodeError during notification if you put a message with non-ascii chars
   [dmoro]
 
+- Added a new property on portal_pbnotification named mail_subject used for email notification
+  [dmoro]
+
 
 0.2 (2010-09-23)
 ----------------

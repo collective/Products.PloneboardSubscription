@@ -61,6 +61,7 @@ page after logging in.
 """
 
     mail_template = mail_template.split('\n')
+    mail_subject = 'Forum Notification'
 
     _properties = (
                    {'id': 'debug_mode',
@@ -75,6 +76,10 @@ page after logging in.
                     'label': 'last_sent',
                     'mode': 'w',
                     'type': 'str'},
+                   {'id': 'mail_subject',
+                    'label': 'mail_subject',
+                    'mode': 'w',
+                    'type': 'string'},
                    {'id': 'mail_template',
                     'label': 'mail template',
                     'mode': 'w',
@@ -213,13 +218,14 @@ page after logging in.
         email_from_name = portal.getProperty('email_from_name')
         email_from_address = portal.getProperty('email_from_address')
         encoding = ptool.getProperty('default_charset', 'utf-8')
+        email_subject = getattr(self, 'mail_subject', '')
 
         n_messages_sent = 0
         this_message = u"""From: %s <%s>
 To: %s <%s>
-Subject: %s Forum Notification
+Subject: %s - %s
 %s
-""" % (email_from_name, email_from_address, fullname, address, portal_title.decode(encoding), message.decode(encoding))
+""" % (email_from_name, email_from_address, fullname, address, portal_title.decode(encoding), email_subject.decode(encoding), message.decode(encoding))
         this_message = self.encodeMailHeaders(this_message, encoding)
         this_message = this_message.encode(encoding)
 

@@ -13,6 +13,11 @@ Changelog
 - Fix quoting urls in email notifications
   [dmoro]
 
+- modified onItemModification, this method can accept a None object. You can configure a cron task
+  that calls this method on portal_pbnotification. Otherwise email alerts will not be sent until 
+  a new message is added
+  [dmoro]
+
 
 0.2 (2010-09-23)
 ----------------

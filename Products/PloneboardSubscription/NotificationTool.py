@@ -130,13 +130,15 @@ page after logging in.
             if len(self.subscribers[obj_id]) == 0:
                 del self.subscribers[obj_id]
 
-    def onItemModification(self, obj):
+    def onItemModification(self, obj=None):
         """ sends notifications """
-        self.pending.append(obj)
+        if obj:
+            self.pending.append(obj)
         now = int(time())
         if self.last_sent and (now - self.last_sent) < self.send_interval:
             return
-        self.process_pending()
+        if self.pending:
+            self.process_pending()
         self.last_sent = now
         self.pending = PersistentList()
 

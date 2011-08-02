@@ -1,11 +1,9 @@
 import re
 import urllib
-import inspect
 import logging
 from time import time
 from email.Header import Header
 
-from types import StringType
 
 from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
@@ -14,17 +12,10 @@ from OFS.PropertyManager import PropertyManager
 from persistent.mapping import PersistentMapping
 from persistent.list import PersistentList
 
-from AccessControl import Unauthorized
 from AccessControl import ClassSecurityInfo
-from AccessControl import getSecurityManager
-from AccessControl.PermissionRole import rolesForPermissionOn
 
 from Products.CMFCore.utils import UniqueObject
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.Expression import Expression
-
-from Products.CMFPlone.interfaces import IPloneSiteRoot
-from Products.Ploneboard.interfaces import IForum, IConversation, IComment
 
 ID = 'portal_pbnotification'
 TITLE = 'Ploneboard Notification tool'

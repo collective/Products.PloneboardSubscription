@@ -10,6 +10,9 @@ Changelog
 - Added a new property on portal_pbnotification named mail_subject used for email notification
   [dmoro]
 
+- Fix quoting urls in email notifications
+  [dmoro]
+
 
 0.2 (2010-09-23)
 ----------------

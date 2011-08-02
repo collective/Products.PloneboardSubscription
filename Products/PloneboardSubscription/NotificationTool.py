@@ -1,4 +1,5 @@
 import re
+import urllib
 import inspect
 import logging
 from time import time
@@ -177,7 +178,7 @@ page after logging in.
         portal = getToolByName(self, 'portal_url').getPortalObject()
         portal_title = portal.getProperty('title').split(':')[0]
         portal_id = '/' + portal.getId()
-        urls = '\n'.join(['%s%s' % (portal.absolute_url(), c1.replace(portal_id, '')) for c1 in conv])
+        urls = '\n'.join(['%s%s' % (portal.absolute_url(), urllib.quote(c1.replace(portal_id, ''))) for c1 in conv])
         msg = list(self.mail_template)
         for i in range(len(msg)):
             if msg[i].find('[PORTAL_TITLE]') >= 0:

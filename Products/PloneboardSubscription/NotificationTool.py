@@ -161,7 +161,10 @@ page after logging in.
                     if conv_id not in notify[n1]:
                         notify[n1].append(conv_id)
         for n1 in notify:
-            email, fullname = self.getEmailAddress(n1)
+            try:
+                email, fullname = self.getEmailAddress(n1)
+            except TypeError: 
+                email = None
             if email:
                 message = self.createMessage(notify[n1])
                 self.sendNotification(email, fullname, message)

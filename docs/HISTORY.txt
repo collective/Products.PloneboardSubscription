@@ -18,6 +18,9 @@ Changelog
   a new message is added
   [dmoro]
 
+- added Italian translation
+  [dmoro]
+
 
 0.2 (2010-09-23)
 ----------------

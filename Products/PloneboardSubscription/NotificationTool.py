@@ -24,6 +24,7 @@ from Products.CMFCore.Expression import Expression
 
 from Products.CMFPlone.interfaces import IPloneSiteRoot
 from Products.Ploneboard.interfaces import IForum, IConversation, IComment
+from Products.PloneboardSubscription import PSMessageFactory as _
 
 ID = 'portal_pbnotification'
 TITLE = 'Ploneboard Notification tool'
@@ -47,7 +48,6 @@ class NotificationTool(UniqueObject, SimpleItem, PropertyManager):
     debug_mode = False
     send_interval = 10
     last_sent = ''
-
     mail_template = """Dear [PORTAL_TITLE] Member:
 
 There is new activity in the conversation(s) that you have subscribed to.
@@ -59,7 +59,6 @@ Note: If you no longer want to receive update notices for this conversation,
 follow the link above and click on the Unsubscribe link at the bottom of the
 page after logging in.
 """
-
     mail_template = mail_template.split('\n')
 
     _properties = (
@@ -219,7 +218,7 @@ page after logging in.
 To: %s <%s>
 Subject: %s Forum Notification
 %s
-""" % (email_from_name, email_from_address, fullname, address, portal_title, message)
+""" % (email_from_name, email_from_address, fullname.decode(encoding), address, portal_title.decode(encoding), message.decode(encoding))
         this_message = self.encodeMailHeaders(this_message, encoding)
         this_message = this_message.encode(encoding)
 

@@ -7,6 +7,22 @@
 <browser:viewlet
    name="plone.abovecontenttitle.documentactions"
    for="Products.Ploneboard.content.PloneboardConversation.PloneboardConversation"
+   manager="plone.app.layout.viewlets.interfaces.IAboveContentTitle"
+   template="subscribe.pt"
+   permission="zope2.View"
+  />
+
+<browser:viewlet
+   name="plone.abovecontenttitle.documentactions"
+   for="Products.Ploneboard.content.PloneboardForum.PloneboardForum"
+   manager="plone.app.layout.viewlets.interfaces.IAboveContentTitle"
+   template="subscribe.pt"
+   permission="zope2.View"
+  />
+
+<browser:viewlet
+   name="plone.abovecontenttitle.documentactions"
+   for="Products.Ploneboard.content.PloneboardConversation.PloneboardConversation"
    manager="plone.app.layout.viewlets.interfaces.IBelowContentBody"
    template="subscribe.pt"
    permission="zope2.View"

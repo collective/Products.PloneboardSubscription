@@ -48,6 +48,7 @@ class NotificationTool(UniqueObject, SimpleItem, PropertyManager):
     debug_mode = False
     send_interval = 10
     last_sent = ''
+    auto_subscribe = False
     mail_template = """Dear [PORTAL_TITLE] Member:
 
 There is new activity in the conversation(s) that you have subscribed to.
@@ -78,6 +79,10 @@ page after logging in.
                     'label': 'mail template',
                     'mode': 'w',
                     'type': 'lines'},
+                   {'id': 'auto_subscribe',
+                    'label': 'auto subscribe',
+                    'mode': 'w',
+                    'type': 'boolean'},
                   )
 
     security = ClassSecurityInfo()
@@ -125,6 +130,13 @@ page after logging in.
 
     def onItemModification(self, obj):
         """ sends notifications """
+        if self.auto_subscribe:
+            # we don't check if user is already in dict because addSubscriber method do this
+            mtool = getToolByName(self, 'portal_membership')
+            memberid = mtool.getAuthenticatedMember().getId()
+            conv = obj.getConversation()
+            self.addSubscriber(conv, memberid)
+
         self.pending.append(obj)
         now = int(time())
         if self.last_sent and (now - self.last_sent) < self.send_interval:

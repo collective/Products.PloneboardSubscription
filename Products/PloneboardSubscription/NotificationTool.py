@@ -180,10 +180,11 @@ page after logging in.
         
     def createMessage(self, conv):
         """Return email addresses of ``user``."""
-        portal = getToolByName(self, 'portal_url').getPortalObject()
-        portal_title = portal.getProperty('title').split(':')[0]
-        portal_id = '/' + portal.getId()
-        urls = '\n'.join(['%s%s' % (portal.absolute_url(), c1.replace(portal_id, '')) for c1 in conv])
+        purl = getToolByName(self, 'portal_url')
+        portal = purl.getPortalObject()
+        portal_title = portal.getProperty('title').split(':')[0]        
+        portal_path = purl.getPortalPath()
+        urls = '\n'.join(['%s%s' % (portal.absolute_url(), c1.replace(portal_path, '')) for c1 in conv])
         msg = list(self.mail_template)
         for i in range(len(msg)):
             if msg[i].find('[PORTAL_TITLE]') >= 0:

@@ -1,0 +1,15 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:browser="http://namespaces.zope.org/browser"
+           xmlns:plone="http://namespaces.plone.org/plone">
+
+    <include package="plone.portlets" />
+
+    <plone:portlet
+        name="portlets.PloneboardSubscription"
+        interface=".subscriptions.ISubscriptionPortlet"
+        assignment=".subscriptions.Assignment"
+        renderer=".subscriptions.Renderer"
+        addview=".subscriptions.AddForm"
+        />
+
+</configure>

@@ -48,15 +48,14 @@
     permission="zope2.View"
     />
 
-<!--
 <browser:page
     for="*"
-    name="view_pending"
-    class=".pending_view.PendingView"
+    name="view_subscriptions"
+    class=".subscription_view.SubscriptionView"
     permission="zope2.View"
-    template="pending_view.pt"
+    template="subscription_view.pt"
     />
--->
+
 <!-- Item modification event handler -->
 <subscriber
        for="Products.Ploneboard.interfaces.IComment

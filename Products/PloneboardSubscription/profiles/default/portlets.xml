@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<portlets>
+ <portlet title="Forum Subscriptions" addview="portlets.PloneboardSubscription"
+    description="A portlet which can render a listing of discussion and forums subscriptions">
+ </portlet>
+</portlets>

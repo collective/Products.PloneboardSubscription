@@ -5,6 +5,7 @@
     i18n_domain="PloneboardSubscription">
 
     <include package=".browser" />
+    <include package=".portlets" />
 
     <i18n:registerTranslations directory="locales" />
 

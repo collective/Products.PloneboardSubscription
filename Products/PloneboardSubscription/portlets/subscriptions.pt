@@ -1,0 +1,42 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      tal:omit-tag="">
+<dl class="portlet portletPloneboardSubscription"
+    i18n:domain="plone">
+
+    <dt class="portletHeader">
+        <span class="portletTopLeft"></span>
+        <a tal:attributes="href string:${context/absolute_url}/view_subscriptions">Subscriptions</a>
+        <span class="portletTopRight"></span>
+    </dt>
+
+    <tal:items tal:define="plone_view context/@@plone;
+                           toLocalizedTime nocall:plone_view/toLocalizedTime;"
+                           tal:repeat="obj view/subscriptions">
+
+        <dd class="portletItem"
+            tal:define="oddrow repeat/obj/odd"
+            tal:attributes="class python:oddrow and  'portletItem even' or 'portletItem odd'">
+            <a href=""
+               tal:attributes="href string:${obj/getURL}/view;
+                               title obj/Description;">
+                <tal:title content="obj/pretty_title_or_id">
+                    Title
+                </tal:title>
+                <span class="portletItemDetails"
+                      tal:content="python:toLocalizedTime(obj.ModificationDate)"
+                      >May 5</span>
+            </a>
+        </dd>
+    </tal:items>
+
+
+    <dd class="portletFooter">
+        <span class="portletBottomLeft"></span>
+        <a tal:condition="view/areTooMany" tal:attributes="href string:${context/absolute_url}/view_subscriptions">All Subscriptions</a>
+        <span class="portletBottomRight"></span>
+    </dd>
+
+</dl>
+</html>

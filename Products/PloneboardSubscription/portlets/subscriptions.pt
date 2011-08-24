@@ -24,9 +24,11 @@
                 <tal:title content="obj/pretty_title_or_id">
                     Title
                 </tal:title>
-                <span class="portletItemDetails"
-                      tal:content="python:toLocalizedTime(obj.ModificationDate)"
-                      >May 5</span>
+                <tal:comment replace="nothing">
+                    <span class="portletItemDetails"
+                          tal:content="python:toLocalizedTime(obj.ModificationDate)"
+                          >May 5</span>
+                </tal:comment>
             </a>
         </dd>
     </tal:items>

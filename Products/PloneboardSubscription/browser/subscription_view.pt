@@ -14,7 +14,8 @@
     <br />
     <div tal:define="plone_view context/@@plone;
                      toLocalizedTime nocall:plone_view/toLocalizedTime;
-                     limit_display python:2;
+                     limit_display limit_display|request/limit_display|nothing;
+                     limit_display python:limit_display and int(limit_display) or None;
                      Batch python:modules['Products.CMFPlone'].Batch;
                      b_start python:request.get('b_start', 0);
                      items items|view/getPending;

@@ -7,7 +7,7 @@
 
     <dt class="portletHeader">
         <span class="portletTopLeft"></span>
-        <a tal:attributes="href string:${context/absolute_url}/view_subscriptions">Subscriptions</a>
+        <a tal:attributes="href string:${context/absolute_url}/view_subscriptions">Iscrizioni</a>
         <span class="portletTopRight"></span>
     </dt>
 
@@ -31,10 +31,9 @@
         </dd>
     </tal:items>
 
-
     <dd class="portletFooter">
         <span class="portletBottomLeft"></span>
-        <a tal:condition="view/areTooMany" tal:attributes="href string:${context/absolute_url}/view_subscriptions">All Subscriptions</a>
+        <a tal:condition="view/areTooMany" tal:attributes="href string:${context/absolute_url}/view_subscriptions">Tutte le iscrizioni ...</a>
         <span class="portletBottomRight"></span>
     </dd>
 

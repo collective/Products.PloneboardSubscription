@@ -15,7 +15,7 @@ class ISubscriptionPortlet(IPortletDataProvider):
 
 class Assignment(base.Assignment):
     implements(ISubscriptionPortlet)
-    title = u'Subscriptions'
+    title = u'Iscrizioni al forum'
 
 
 class Renderer(base.Renderer):

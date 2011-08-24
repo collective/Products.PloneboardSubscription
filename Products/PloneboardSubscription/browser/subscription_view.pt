@@ -17,7 +17,7 @@
                      limit_display python:2;
                      Batch python:modules['Products.CMFPlone'].Batch;
                      b_start python:request.get('b_start', 0);
-                     items view/getPending;
+                     items items|view/getPending;
                      batch python:items and Batch(items, limit_display or 100, int(b_start), orphan=5);
                      navigation_root_url context/@@plone_portal_state/navigation_root_url;
                      pas_member context/@@pas_member;

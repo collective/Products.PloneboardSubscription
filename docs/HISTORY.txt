@@ -21,6 +21,9 @@ Changelog
 - added Italian translation
   [dmoro]
 
+- added subscriptions portlet
+  [mlupo+dmoro]
+
 
 0.2 (2010-09-23)
 ----------------

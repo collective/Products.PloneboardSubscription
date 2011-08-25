@@ -4,9 +4,10 @@
       tal:omit-tag="">
 <dl class="portlet portletPloneboardSubscription"
     tal:define="subscriptions view/subscriptions;"
+    tal:condition="subscriptions"
     i18n:domain="plone">
 
-    <dt class="portletHeader" tal:condition="subscriptions">
+    <dt class="portletHeader">
         <span class="portletTopLeft"></span>
         <a tal:attributes="href string:${context/absolute_url}/view_subscriptions">Iscrizioni</a>
         <span class="portletTopRight"></span>

@@ -3,9 +3,10 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       tal:omit-tag="">
 <dl class="portlet portletPloneboardSubscription"
+    tal:define="subscriptions view/subscriptions;"
     i18n:domain="plone">
 
-    <dt class="portletHeader">
+    <dt class="portletHeader" tal:condition="subscriptions">
         <span class="portletTopLeft"></span>
         <a tal:attributes="href string:${context/absolute_url}/view_subscriptions">Iscrizioni</a>
         <span class="portletTopRight"></span>
@@ -13,7 +14,7 @@
 
     <tal:items tal:define="plone_view context/@@plone;
                            toLocalizedTime nocall:plone_view/toLocalizedTime;"
-                           tal:repeat="obj view/subscriptions">
+                           tal:repeat="obj subscriptions">
 
         <dd class="portletItem"
             tal:define="oddrow repeat/obj/odd"

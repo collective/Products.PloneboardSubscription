@@ -238,6 +238,7 @@ Subject: %s Forum Notification
         if self.getProperty('debug_mode'):
             LOG.info('About to send this message to %s: \n%s',
                      address, this_message)
+            return 0
 
         try:
             mailhost.send(this_message)

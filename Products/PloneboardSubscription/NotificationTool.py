@@ -1,10 +1,7 @@
 import re
-import inspect
 import logging
 from time import time
 from email.Header import Header
-
-from types import StringType
 
 from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
@@ -13,18 +10,10 @@ from OFS.PropertyManager import PropertyManager
 from persistent.mapping import PersistentMapping
 from persistent.list import PersistentList
 
-from AccessControl import Unauthorized
 from AccessControl import ClassSecurityInfo
-from AccessControl import getSecurityManager
-from AccessControl.PermissionRole import rolesForPermissionOn
 
 from Products.CMFCore.utils import UniqueObject
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.Expression import Expression
-
-from Products.CMFPlone.interfaces import IPloneSiteRoot
-from Products.Ploneboard.interfaces import IForum, IConversation, IComment
-from Products.PloneboardSubscription import PSMessageFactory as _
 
 ID = 'portal_pbnotification'
 TITLE = 'Ploneboard Notification tool'
@@ -49,6 +38,7 @@ class NotificationTool(UniqueObject, SimpleItem, PropertyManager):
     send_interval = 10
     last_sent = ''
     auto_subscribe = False
+    html_format = False
     mail_template = """Dear [PORTAL_TITLE] Member:
 
 There is new activity in the conversation(s) that you have subscribed to.
@@ -75,6 +65,10 @@ page after logging in.
                     'label': 'last_sent',
                     'mode': 'w',
                     'type': 'str'},
+                   {'id': 'html_format',
+                    'label': 'html mail format',
+                    'mode': 'w',
+                    'type': 'boolean'},
                    {'id': 'mail_template',
                     'label': 'mail template',
                     'mode': 'w',
@@ -148,6 +142,7 @@ page after logging in.
     def process_pending(self):
         """ sends notifications """
         notify = {}
+        portal_path = getToolByName(self, 'portal_url').getPortalPath()
         for obj in self.pending:
             creator = obj.Creator()
             conv = obj.getConversation()
@@ -157,40 +152,65 @@ page after logging in.
             forum = conv.getForum()
             conv_id = self.getObjId(conv)
             forum_id = self.getObjId(forum)
+            convd = {}
+            convd['conv'] = conv
+            convd['id'] = conv_id.replace(portal_path, '')
+            convd['forum'] = forum
             if forum_id in self.subscribers:
                 for n1 in self.subscribers[forum_id]:
                     if n1 == creator:
                         continue
                     if n1 not in notify:
-                        notify[n1] = []
-                    notify[n1].append(conv_id)
+                        notify[n1] = {'cvs':[], 'key':','}
+                    if ',%s,'%convd['id'] not in notify[n1]['key']:
+                        notify[n1]['cvs'].append(convd)
+                        notify[n1]['key'] = "%s%s," % (notify[n1]['key'], convd['id'])
             if conv_id in self.subscribers:
                 for n1 in self.subscribers[conv_id]:
                     if n1 == creator:
                         continue
                     if n1 not in notify:
-                        notify[n1] = []
-                    if conv_id not in notify[n1]:
-                        notify[n1].append(conv_id)
+                        notify[n1] = {'cvs':[], 'key':','}
+                    if ',%s,'%convd['id'] not in notify[n1]['key']:
+                        notify[n1]['cvs'].append(convd)
+                        notify[n1]['key'] = "%s%s," % (notify[n1]['key'], convd['id'])
+
+        messages = {}
         for n1 in notify:
             email, fullname = self.getEmailAddress(n1)
             if email:
-                message = self.createMessage(notify[n1])
-                self.sendNotification(email, fullname, message)
+                # we make the message only one time for each conversations combination
+                if not messages.has_key(notify[n1]['key']):
+                    messages[notify[n1]['key']] = self.createMessage(notify[n1]['cvs'])
+                self.sendNotification(email, fullname, messages[notify[n1]['key']])
         
-    def createMessage(self, conv):
+    def createMessage(self, conversations):
         """Return email addresses of ``user``."""
-        purl = getToolByName(self, 'portal_url')
-        portal = purl.getPortalObject()
+        portal = getToolByName(self, 'portal_url').getPortalObject()
         portal_title = portal.getProperty('title').split(':')[0]        
-        portal_path = purl.getPortalPath()
-        urls = '\n'.join(['%s%s' % (portal.absolute_url(), c1.replace(portal_path, '')) for c1 in conv])
+
+        def formatUrls(with_forum=False, with_comment=False):
+            urls = ''
+            for convd in conversations:
+                title = convd['conv'].Title()
+                if with_forum:
+                    title = '%s: %s'%(convd['forum'].Title(), title)
+                if self.html_format:
+                    urls += '<li><a href="%s%s">%s</a></li>\n' % (portal.absolute_url(), convd['id'], title)
+                else:
+                    urls += '%s%s\n' % (portal.absolute_url(), convd['id'])
+            if self.html_format:
+                urls = '<ul>\n%s\n</ul>' % urls
+            return urls
+
         msg = list(self.mail_template)
         for i in range(len(msg)):
             if msg[i].find('[PORTAL_TITLE]') >= 0:
                 msg[i] = msg[i].replace('[PORTAL_TITLE]', portal_title)
-            elif msg[i].startswith('[URLS]'):
-                msg[i] = urls
+            if msg[i].find('[URLS]') >= 0:
+                msg[i] = msg[i].replace('[URLS]', formatUrls())
+            if msg[i].find('[FORUMS]') >= 0:
+                msg[i] = msg[i].replace('[FORUMS]', formatUrls(with_forum=True))
         return '\n'.join(msg)
 
     def getEmailAddress(self, user):
@@ -240,8 +260,11 @@ Subject: %s Forum Notification
                      address, this_message)
             return 0
 
+        msg_type = 'text/plain'
+        if self.html_format:
+            msg_type = 'text/html'
         try:
-            mailhost.send(this_message)
+            mailhost.send(this_message, msg_type=msg_type)
             n_messages_sent += 1
         except ConflictError:
             raise

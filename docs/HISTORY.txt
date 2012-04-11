@@ -4,7 +4,9 @@ Changelog
 0.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Auto subscribe option : a user adding a comment will be added in the subscribers list for the corresponding conversation. (Stéphan Geulette)
+- Html email option : the mail can be sent in html format (Stéphan Geulette)
+- Email can contains different information levels (Stéphan Geulette)
 
 
 0.2 (2010-09-23)

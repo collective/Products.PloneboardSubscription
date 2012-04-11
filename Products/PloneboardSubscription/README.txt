@@ -24,6 +24,6 @@ parameters that can be set:
     The following special parts will be replaced:
         * [PORTAL_TITLE] : by the portal title
         * [URLS] : by the modified conversation urls
-        * [FORUMS] : by the modified conversation urls and the corresponding forum
-        * [DETAILS] : by the modified conversation urls and the corresponding comments (only in html format)
+        * [FORUMS] : by the modified conversation urls and the corresponding forum (only in html format)
+        * [COMMENTS] : by the modified conversation urls, the corresponding foum and the new comments (only in html format)
 * auto_subscribe : if checked, each member adding a comment will be added in the conversation subscribers list. 

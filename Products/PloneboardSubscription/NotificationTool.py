@@ -14,6 +14,8 @@ from AccessControl import ClassSecurityInfo
 
 from Products.CMFCore.utils import UniqueObject
 from Products.CMFCore.utils import getToolByName
+from zope.i18n import translate
+from Products.CMFPlone.i18nl10n import ulocalized_time
 
 ID = 'portal_pbnotification'
 TITLE = 'Ploneboard Notification tool'
@@ -156,33 +158,37 @@ page after logging in.
             convd['conv'] = conv
             convd['id'] = conv_id.replace(portal_path, '')
             convd['forum'] = forum
+            convd['cmts'] = []
             if forum_id in self.subscribers:
                 for n1 in self.subscribers[forum_id]:
                     if n1 == creator:
                         continue
                     if n1 not in notify:
-                        notify[n1] = {'cvs':[], 'key':','}
-                    if ',%s,'%convd['id'] not in notify[n1]['key']:
-                        notify[n1]['cvs'].append(convd)
-                        notify[n1]['key'] = "%s%s," % (notify[n1]['key'], convd['id'])
+                        notify[n1] = {'cvs':{}, 'key':[]}
+                    if convd['id'] not in notify[n1]['key']:
+                        notify[n1]['key'].append(convd['id'])
+                        notify[n1]['cvs'][convd['id']] = convd
+                    notify[n1]['cvs'][convd['id']]['cmts'].append(obj)
             if conv_id in self.subscribers:
                 for n1 in self.subscribers[conv_id]:
                     if n1 == creator:
                         continue
                     if n1 not in notify:
-                        notify[n1] = {'cvs':[], 'key':','}
-                    if ',%s,'%convd['id'] not in notify[n1]['key']:
-                        notify[n1]['cvs'].append(convd)
-                        notify[n1]['key'] = "%s%s," % (notify[n1]['key'], convd['id'])
+                        notify[n1] = {'cvs':{}, 'key':[]}
+                    if convd['id'] not in notify[n1]['key']:
+                        notify[n1]['key'].append(convd['id'])
+                        notify[n1]['cvs'][convd['id']] = convd
+                    notify[n1]['cvs'][convd['id']]['cmts'].append(obj)
 
         messages = {}
         for n1 in notify:
             email, fullname = self.getEmailAddress(n1)
             if email:
                 # we make the message only one time for each conversations combination
-                if not messages.has_key(notify[n1]['key']):
-                    messages[notify[n1]['key']] = self.createMessage(notify[n1]['cvs'])
-                self.sendNotification(email, fullname, messages[notify[n1]['key']])
+                key = ','.join(notify[n1]['key'])
+                if not messages.has_key(key):
+                    messages[key] = self.createMessage(notify[n1])
+                self.sendNotification(email, fullname, messages[key])
         
     def createMessage(self, conversations):
         """Return email addresses of ``user``."""
@@ -191,16 +197,22 @@ page after logging in.
 
         def formatUrls(with_forum=False, with_comment=False):
             urls = ''
-            for convd in conversations:
+            for conv_id in conversations['key']:
+                convd = conversations['cvs'][conv_id]
                 title = convd['conv'].Title()
                 if with_forum:
                     title = '%s: %s'%(convd['forum'].Title(), title)
                 if self.html_format:
-                    urls += '<li><a href="%s%s">%s</a></li>\n' % (portal.absolute_url(), convd['id'], title)
+                    urls += '<h3><a href="%s%s">%s</a></h3>\n' % (portal.absolute_url(), conv_id, title)
                 else:
-                    urls += '%s%s\n' % (portal.absolute_url(), convd['id'])
-            if self.html_format:
-                urls = '<ul>\n%s\n</ul>' % urls
+                    urls += '%s%s\n' % (portal.absolute_url(), conv_id)
+                if with_comment:
+                    comments = ''
+                    for comment in convd['cmts']:
+                        creatorinfo = portal.portal_membership.getMemberInfo(comment.Creator())
+                        urls += '<li style="padding-left:2em;"><strong>%s %s %s %s</strong><br />\n'%(translate('posted_by', 'ploneboard', context=self.REQUEST, default='Posted by').encode('utf8'), creatorinfo is not None and creatorinfo['fullname'] or comment.Creator(), translate('text_at', 'ploneboard', context=self.REQUEST, default='at').encode('utf8'), ulocalized_time(comment.creation_date, long_format=True, context=self, request=self.REQUEST).encode('utf8'))
+                        urls += '%s\n</li>\n'%comment.getText()
+                    urls += '<ul>\n%s\n</ul>' % comments
             return urls
 
         msg = list(self.mail_template)
@@ -211,6 +223,8 @@ page after logging in.
                 msg[i] = msg[i].replace('[URLS]', formatUrls())
             if msg[i].find('[FORUMS]') >= 0:
                 msg[i] = msg[i].replace('[FORUMS]', formatUrls(with_forum=True))
+            if msg[i].find('[COMMENTS]') >= 0:
+                msg[i] = msg[i].replace('[COMMENTS]', formatUrls(with_comment=True))
         return '\n'.join(msg)
 
     def getEmailAddress(self, user):

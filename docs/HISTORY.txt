@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.3 (unreleased)
+0.3 (2012-04-15)
 ----------------
 
 - Auto subscribe option : a user adding a comment will be added in the subscribers list for the corresponding conversation. (Stéphan Geulette)

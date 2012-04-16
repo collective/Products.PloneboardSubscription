@@ -1,10 +1,10 @@
 Changelog
 =========
 
-0.4 (unreleased)
+0.4 (2012-04-16)
 ----------------
 
-- Nothing changed yet.
+- Removed dependency on PasteScript. Seems to go on an infinite loop downloading PasteScript while install.
 
 
 0.3 (2012-04-15)

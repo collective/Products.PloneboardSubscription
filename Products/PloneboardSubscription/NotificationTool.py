@@ -156,7 +156,7 @@ page after logging in.
             forum_id = self.getObjId(forum)
             convd = {}
             convd['conv'] = conv
-            convd['id'] = conv_id.replace(portal_path, '')
+            convd['id'] = conv_id.replace(portal_path, '', 1)
             convd['forum'] = forum
             convd['cmts'] = []
             if forum_id in self.subscribers:

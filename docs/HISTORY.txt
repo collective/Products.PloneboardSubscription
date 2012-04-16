@@ -1,10 +1,10 @@
 Changelog
 =========
 
-0.5 (unreleased)
+0.5 (2012-04-16)
 ----------------
 
-- Nothing changed yet.
+- Replace only the 1st occurrance of portal path. Thanks to Tim Churches.
 
 
 0.4 (2012-04-16)

@@ -144,6 +144,7 @@ page after logging in.
     def process_pending(self):
         """ sends notifications """
         notify = {}
+        conversations = {}
         portal_path = getToolByName(self, 'portal_url').getPortalPath()
         for obj in self.pending:
             creator = obj.Creator()
@@ -152,53 +153,53 @@ page after logging in.
                 LOG.error('Comment: %s has no conv' % '/'.join(obj.getPhysicalPath()))
                 continue
             forum = conv.getForum()
-            conv_id = self.getObjId(conv)
+            conv_full_id = self.getObjId(conv)
             forum_id = self.getObjId(forum)
-            convd = {}
-            convd['conv'] = conv
-            convd['id'] = conv_id.replace(portal_path, '', 1)
-            convd['forum'] = forum
-            convd['cmts'] = []
+            conv_id = conv_full_id.replace(portal_path, '', 1)
+            if not conversations.has_key(conv_id):
+                conversations[conv_id] = {}
+                conversations[conv_id]['conv'] = conv
+                conversations[conv_id]['id'] = conv_id
+                conversations[conv_id]['forum'] = forum
+                conversations[conv_id]['cmts'] = []
+            conversations[conv_id]['cmts'].append(obj)
+
             if forum_id in self.subscribers:
                 for n1 in self.subscribers[forum_id]:
                     if n1 == creator:
                         continue
                     if n1 not in notify:
-                        notify[n1] = {'cvs':{}, 'key':[]}
-                    if convd['id'] not in notify[n1]['key']:
-                        notify[n1]['key'].append(convd['id'])
-                        notify[n1]['cvs'][convd['id']] = convd
-                    notify[n1]['cvs'][convd['id']]['cmts'].append(obj)
-            if conv_id in self.subscribers:
-                for n1 in self.subscribers[conv_id]:
+                        notify[n1] = []
+                    if conv_id not in notify[n1]:
+                        notify[n1].append(conv_id)
+            if conv_full_id in self.subscribers:
+                for n1 in self.subscribers[conv_full_id]:
                     if n1 == creator:
                         continue
                     if n1 not in notify:
-                        notify[n1] = {'cvs':{}, 'key':[]}
-                    if convd['id'] not in notify[n1]['key']:
-                        notify[n1]['key'].append(convd['id'])
-                        notify[n1]['cvs'][convd['id']] = convd
-                    notify[n1]['cvs'][convd['id']]['cmts'].append(obj)
+                        notify[n1] = []
+                    if conv_id not in notify[n1]:
+                        notify[n1].append(conv_id)
 
         messages = {}
         for n1 in notify:
             email, fullname = self.getEmailAddress(n1)
             if email:
                 # we make the message only one time for each conversations combination
-                key = ','.join(notify[n1]['key'])
+                key = ','.join(notify[n1])
                 if not messages.has_key(key):
-                    messages[key] = self.createMessage(notify[n1])
+                    messages[key] = self.createMessage(notify[n1], conversations)
                 self.sendNotification(email, fullname, messages[key])
         
-    def createMessage(self, conversations):
+    def createMessage(self, conv_ids, conversations):
         """Return email addresses of ``user``."""
         portal = getToolByName(self, 'portal_url').getPortalObject()
         portal_title = portal.getProperty('title').split(':')[0]        
 
         def formatUrls(with_forum=False, with_comment=False):
             urls = ''
-            for conv_id in conversations['key']:
-                convd = conversations['cvs'][conv_id]
+            for conv_id in conv_ids:
+                convd = conversations[conv_id]
                 title = convd['conv'].Title()
                 if with_forum:
                     title = '%s: %s'%(convd['forum'].Title(), title)

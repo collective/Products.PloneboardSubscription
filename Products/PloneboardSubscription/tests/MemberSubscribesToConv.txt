@@ -1,6 +1,11 @@
 Using a member-posting forum
 ============================
 
+Checking MockMailHost
+
+    >>> self.portal.MailHost
+    <MockMailHost at ...>
+
 Test starting conversations, replying and modifying comments in a default
 member-posting forum.
 
@@ -53,6 +58,8 @@ Check the tool
 
     >>> len(self.portal.portal_pbnotification.subscribers.keys())
     0
+    >>> self.portal.portal_pbnotification.auto_subscribe
+    False
 
 Add a new conversation
 ----------------------
@@ -128,7 +135,7 @@ This should have triggered a notification. Check the MockMailHost
     1
 
     >>> self.portal.MailHost.messages[0]
-    'To: member2@example.com...'
+    'From: <>\nTo: Member two <member2@example.com>...'
 
     >>> conversation.absolute_url() in self.portal.MailHost.messages[0]
     True
@@ -137,3 +144,98 @@ This should have triggered a notification. Check the MockMailHost
 
     >>> len(self.portal.MailHost.messages)
     0
+
+Set auto subscribe mode
+-----------------------
+
+    >>> self.portal.portal_pbnotification.auto_subscribe = True
+    >>> self.portal.portal_pbnotification.auto_subscribe
+    True
+
+There is one conversation as key
+    >>> len(self.portal.portal_pbnotification.subscribers.keys())
+    1
+
+There is one member as value
+    >>> len(self.portal.portal_pbnotification.subscribers.values()[0])
+    1
+
+Go back as member1 and add a reply
+-----------------------------------
+
+    >>> utils.logoutThenLoginAs(self, browser, 'member1')
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
+    >>> browser.getControl(name='text').value = 'A new quick reply to check autosubscription'
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(conversation.absolute_url())
+    True
+    >>> browser.contents
+    '...A new quick reply to check autosubscription...'
+
+Check the tool
+--------------
+
+There are now 2 subscribed members for the conversation
+    >>> len(self.portal.portal_pbnotification.subscribers.values()[0])
+    2
+
+Force the tool
+--------------
+
+    >>> self.portal.portal_pbnotification.process_pending()
+
+This should have triggered a notification. Check the MockMailHost
+------------------------------------------------------------------
+
+    >>> len(self.portal.MailHost.messages)
+    1
+
+    >>> self.portal.MailHost.messages[0]
+    'From: <>\nTo: Member two <member2@example.com>...'
+
+    >>> conversation.absolute_url() in self.portal.MailHost.messages[0]
+    True
+
+    >>> self.portal.MailHost.reset()
+
+Go back as member2 and add a reply
+-----------------------------------
+
+    >>> utils.logoutThenLoginAs(self, browser, 'member2')
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
+    >>> browser.getControl(name='text').value = 'A new quick reply to check autosubscription from member2'
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(conversation.absolute_url())
+    True
+    >>> browser.contents
+    '...A new quick reply to check autosubscription from member2...'
+
+Check the tool
+--------------
+
+There are yet 2 subscribed members for the conversation
+    >>> len(self.portal.portal_pbnotification.subscribers.values()[0])
+    2
+
+Force the tool
+--------------
+
+    >>> self.portal.portal_pbnotification.process_pending()
+
+This should have triggered a notification. Check the MockMailHost
+------------------------------------------------------------------
+
+    >>> len(self.portal.MailHost.messages)
+    1
+
+    >>> self.portal.MailHost.messages[0]
+    'From: <>\nTo: Member one <member1@example.com>...'
+
+    >>> conversation.absolute_url() in self.portal.MailHost.messages[0]
+    True
+
+    >>> self.portal.MailHost.reset()

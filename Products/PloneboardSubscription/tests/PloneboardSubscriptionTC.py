@@ -27,3 +27,10 @@ class FunctionalTestCase(PloneTestCase.FunctionalTestCase):
         self.browser.handleErrors = False
         self.portal.error_log._ignored_exceptions = ()
         self.portal.left_slots = self.portal.right_slots = []
+        mailhost = self.portal.MailHost
+        from collective.MockMailHost.MockMailHost import MockMailHost
+        # Checking if MailHost is a MockMailost object. Not always the case!
+        if not isinstance(mailhost, MockMailHost):
+            from collective.MockMailHost.setuphandlers import replace_mailhost
+            replace_mailhost(self.portal)
+            print "REPLACING MAILHOST\n"

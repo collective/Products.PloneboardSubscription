@@ -1,6 +1,11 @@
 Using a member-posting forum
 ============================
 
+Checking MockMailHost
+
+    >>> self.portal.MailHost
+    <MockMailHost at ...>
+
 Test starting conversations, replying and modifying comments in a default
 member-posting forum.
 
@@ -137,7 +142,7 @@ This should have triggered a notification. Check the MockMailHost
     1
 
     >>> self.portal.MailHost.messages[0]
-    'To: member1@example.com...'
+    'From: <>\nTo: Member one <member1@example.com>...'
 
     >>> conversation.absolute_url() in self.portal.MailHost.messages[0]
     True

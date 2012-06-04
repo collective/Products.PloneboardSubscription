@@ -123,11 +123,6 @@ Add a comment to our own comment. Use the quick-reply field first.
     >>> browser.contents
     '...A quick reply...'
 
-Force the tool
---------------
-
-    >>> self.portal.portal_pbnotification.process_pending()
-
 This should have triggered a notification. Check the MockMailHost
 ------------------------------------------------------------------
 
@@ -145,8 +140,8 @@ This should have triggered a notification. Check the MockMailHost
     >>> len(self.portal.MailHost.messages)
     0
 
-Set auto subscribe mode
------------------------
+Test auto subscribe mode
+========================
 
     >>> self.portal.portal_pbnotification.auto_subscribe = True
     >>> self.portal.portal_pbnotification.auto_subscribe
@@ -180,11 +175,6 @@ Check the tool
 There are now 2 subscribed members for the conversation
     >>> len(self.portal.portal_pbnotification.subscribers.values()[0])
     2
-
-Force the tool
---------------
-
-    >>> self.portal.portal_pbnotification.process_pending()
 
 This should have triggered a notification. Check the MockMailHost
 ------------------------------------------------------------------
@@ -220,11 +210,6 @@ Check the tool
 There are yet 2 subscribed members for the conversation
     >>> len(self.portal.portal_pbnotification.subscribers.values()[0])
     2
-
-Force the tool
---------------
-
-    >>> self.portal.portal_pbnotification.process_pending()
 
 This should have triggered a notification. Check the MockMailHost
 ------------------------------------------------------------------

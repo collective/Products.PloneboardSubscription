@@ -21,14 +21,14 @@ First, some set-up:
     >>> utils.setUpDefaultMembersBoardAndForum(self)
 
     >>> new_mail_template = """Dear John:
-    ... This is a notification.
+    ... This is a notification of [PORTAL_TITLE].
     ...
     ... [URLS]
     ...
     ... Your url is in the mail.
     ... Thanks.
     ...
-    ... Yours sincerley,
+    ... Yours sincerely,
     ... Webmaster""".split('\n')
 
     >>> self.portal.portal_pbnotification.manage_changeProperties(mail_template=new_mail_template)
@@ -93,10 +93,81 @@ This should have triggered a notification. Check the MockMailHost
     >>> self.portal.MailHost.messages[0]
     'From: <>\nTo: Member one <member1@example.com>...'
 
-    >>> conversation.absolute_url() in self.portal.MailHost.messages[0]
+Testing if conversation url is in the mail and formatted as text
+    >>> '\n%s' % conversation.absolute_url() in self.portal.MailHost.messages[0]
     True
 
+Testing if [PORTAL_TITLE] is well replaced
+    >>> 'This is a notification of Plone site.' in self.portal.MailHost.messages[0]
+    True
+
+Checking static parts of the mail
     >>> s1 = [x for x in new_mail_template if x not in ['', '[URLS]']]
+    >>> s1 = [x for x in s1 if '[PORTAL_TITLE]' not in x]
     >>> s2 = [x for x in s1 if x in self.portal.MailHost.messages[0]]
     >>> s1 == s2
     True
+
+    >>> self.portal.MailHost.reset()
+
+Test html format
+================
+
+    >>> self.portal.portal_pbnotification.html_format = True
+    >>> self.portal.portal_pbnotification.html_format
+    True
+
+    >>> new_mail_template = """Dear John:<br />
+    ... This is a notification of [PORTAL_TITLE].<br /><br />
+    ... 
+    ... [URLS]
+    ... 
+    ... <br /><br />Your url is in the mail.<br />
+    ... Thanks.<br /><br />
+    ... 
+    ... Yours sincerely,<br />
+    ... Webmaster<br />""".split('\n')
+
+    >>> self.portal.portal_pbnotification.manage_changeProperties(mail_template=new_mail_template)
+    >>> new_mail_template == list(self.portal.portal_pbnotification.getProperty('mail_template'))
+    True
+
+Add a replay as member2
+----------------------------------
+
+    >>> utils.logoutThenLoginAs(self, browser, 'member2')
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
+    >>> browser.getControl(name='text').value = 'A quick reply to test html format'
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(conversation.absolute_url())
+    True
+    >>> browser.contents
+    '...A quick reply to test html format...'
+
+This should have triggered a notification. Check the MockMailHost
+------------------------------------------------------------------
+
+    >>> len(self.portal.MailHost.messages)
+        1
+
+    >>> self.portal.MailHost.messages[0]
+    'From: <>\nTo: Member one <member1@example.com>...'
+
+Testing if conversation url is in the mail and formatted as html
+    >>> '<h3><a href="%s' % conversation.absolute_url() in self.portal.MailHost.messages[0]
+    True
+
+Testing if [PORTAL_TITLE] is well replaced
+    >>> 'This is a notification of Plone site.' in self.portal.MailHost.messages[0]
+    True
+
+Checking static parts of the mail
+    >>> s1 = [x for x in new_mail_template if x not in ['', '[URLS]']]
+    >>> s1 = [x for x in s1 if '[PORTAL_TITLE]' not in x]
+    >>> s2 = [x for x in s1 if x in self.portal.MailHost.messages[0]]
+    >>> s1 == s2
+    True
+
+    >>> self.portal.MailHost.reset()

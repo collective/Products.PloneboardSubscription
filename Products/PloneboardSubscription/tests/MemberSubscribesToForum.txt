@@ -130,11 +130,6 @@ Submit and make sure we go back to the conversation
     >>> browser.contents
     '...A full reply...'
 
-Force the tool
---------------
-
-    >>> self.portal.portal_pbnotification.process_pending()
-
 This should have triggered a notification. Check the MockMailHost
 ------------------------------------------------------------------
 

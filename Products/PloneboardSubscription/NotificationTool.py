@@ -210,8 +210,8 @@ page after logging in.
                     comments = ''
                     for comment in convd['cmts']:
                         creatorinfo = portal.portal_membership.getMemberInfo(comment.Creator())
-                        urls += '<li style="padding-left:2em;"><strong>%s %s %s %s</strong><br />\n'%(translate('posted_by', 'ploneboard', context=self.REQUEST, default='Posted by').encode('utf8'), creatorinfo is not None and creatorinfo['fullname'] or comment.Creator(), translate('text_at', 'ploneboard', context=self.REQUEST, default='at').encode('utf8'), ulocalized_time(comment.creation_date, long_format=True, context=self, request=self.REQUEST).encode('utf8'))
-                        urls += '%s\n</li>\n'%comment.getText()
+                        comments += '<li style="padding-left:2em;"><strong>%s %s %s %s</strong><br />\n'%(translate('posted_by', 'ploneboard', context=self.REQUEST, default='Posted by').encode('utf8'), creatorinfo is not None and creatorinfo['fullname'] or comment.Creator(), translate('text_at', 'ploneboard', context=self.REQUEST, default='at').encode('utf8'), ulocalized_time(comment.creation_date, long_format=True, context=self, request=self.REQUEST).encode('utf8'))
+                        comments += '%s\n</li>\n'%comment.getText()
                     urls += '<ul>\n%s\n</ul>' % comments
             return urls
 
@@ -224,7 +224,7 @@ page after logging in.
             if msg[i].find('[FORUMS]') >= 0:
                 msg[i] = msg[i].replace('[FORUMS]', formatUrls(with_forum=True))
             if msg[i].find('[COMMENTS]') >= 0:
-                msg[i] = msg[i].replace('[COMMENTS]', formatUrls(with_comment=True))
+                msg[i] = msg[i].replace('[COMMENTS]', formatUrls(with_forum=True, with_comment=True))
         return '\n'.join(msg)
 
     def getEmailAddress(self, user):

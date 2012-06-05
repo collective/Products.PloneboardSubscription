@@ -190,7 +190,9 @@ page after logging in.
                 if not messages.has_key(key):
                     messages[key] = self.createMessage(notify[n1], conversations)
                 self.sendNotification(email, fullname, messages[key])
-        
+
+        del notify, conversations, messages
+
     def createMessage(self, conv_ids, conversations):
         """Return email addresses of ``user``."""
         portal = getToolByName(self, 'portal_url').getPortalObject()

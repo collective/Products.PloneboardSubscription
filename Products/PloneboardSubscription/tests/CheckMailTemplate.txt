@@ -31,8 +31,9 @@ First, some set-up:
     ... Yours sincerely,
     ... Webmaster""".split('\n')
 
-    >>> self.portal.portal_pbnotification.manage_changeProperties(mail_template=new_mail_template)
-    >>> new_mail_template == list(self.portal.portal_pbnotification.getProperty('mail_template'))
+    >>> tool = self.portal.portal_pbnotification
+    >>> tool.manage_changeProperties(mail_template=new_mail_template)
+    >>> new_mail_template == list(tool.getProperty('mail_template'))
     True
 
     >>> browser = self.browser
@@ -58,6 +59,14 @@ Look for Subscribe link
 
     >>> browser.getLink('Subscribe').click()
 
+There is now one forum as key
+    >>> tool.subscribers.has_key(tool.getObjId(self.forum))
+    True
+
+There is one member as value
+    >>> len(tool.subscribers[tool.getObjId(self.forum)])
+    1
+
 Add a new conversation as member2
 ----------------------------------
 
@@ -70,7 +79,7 @@ text can contain HTML as well.
     >>> browser.getControl('Start a new Conversation').click()
     >>> browser.url
     '.../add_conversation_form...'
-    >>> browser.getControl('Title').value = 'New title'
+    >>> browser.getControl('Title').value = 'Conversation1'
     >>> browser.getControl('Body text').value = 'Some <b>body</b> text'
 
 Submit the form, and we should be returned to the forum view. The conversation
@@ -113,8 +122,8 @@ Checking static parts of the mail
 Test html format
 ================
 
-    >>> self.portal.portal_pbnotification.html_format = True
-    >>> self.portal.portal_pbnotification.html_format
+    >>> tool.html_format = True
+    >>> tool.html_format
     True
 
     >>> new_mail_template = """Dear John:<br />
@@ -128,8 +137,8 @@ Test html format
     ... Yours sincerely,<br />
     ... Webmaster<br />""".split('\n')
 
-    >>> self.portal.portal_pbnotification.manage_changeProperties(mail_template=new_mail_template)
-    >>> new_mail_template == list(self.portal.portal_pbnotification.getProperty('mail_template'))
+    >>> tool.manage_changeProperties(mail_template=new_mail_template)
+    >>> new_mail_template == list(tool.getProperty('mail_template'))
     True
 
 Add a reply as member2
@@ -172,11 +181,12 @@ Checking static parts of the mail
 
     >>> self.portal.MailHost.reset()
 
+
 Test [FORUMS]
 =============
 
-    >>> self.portal.portal_pbnotification.html_format = True
-    >>> self.portal.portal_pbnotification.html_format
+    >>> tool.html_format = True
+    >>> tool.html_format
     True
 
     >>> new_mail_template = """Dear John:<br />
@@ -190,8 +200,8 @@ Test [FORUMS]
     ... Yours sincerely,<br />
     ... Webmaster<br />""".split('\n')
 
-    >>> self.portal.portal_pbnotification.manage_changeProperties(mail_template=new_mail_template)
-    >>> new_mail_template == list(self.portal.portal_pbnotification.getProperty('mail_template'))
+    >>> tool.manage_changeProperties(mail_template=new_mail_template)
+    >>> new_mail_template == list(tool.getProperty('mail_template'))
     True
 
 Add a reply as member2
@@ -238,11 +248,12 @@ Checking static parts of the mail
 
     >>> self.portal.MailHost.reset()
 
+
 Test [COMMENTS]
 ===============
 
-    >>> self.portal.portal_pbnotification.html_format = True
-    >>> self.portal.portal_pbnotification.html_format
+    >>> tool.html_format = True
+    >>> tool.html_format
     True
 
     >>> new_mail_template = """Dear John:<br />
@@ -256,8 +267,8 @@ Test [COMMENTS]
     ... Yours sincerely,<br />
     ... Webmaster<br />""".split('\n')
 
-    >>> self.portal.portal_pbnotification.manage_changeProperties(mail_template=new_mail_template)
-    >>> new_mail_template == list(self.portal.portal_pbnotification.getProperty('mail_template'))
+    >>> tool.manage_changeProperties(mail_template=new_mail_template)
+    >>> new_mail_template == list(tool.getProperty('mail_template'))
     True
 
 Add a reply as member2
@@ -312,25 +323,31 @@ Subscribing other users
     >>> utils.logoutThenLoginAs(self, browser, 'manager1')
     >>> browser.open(self.board.absolute_url())
     >>> browser.getLink('Forum 1').click()
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
     >>> browser.getLink('Subscribe').click()
 
     >>> utils.logoutThenLoginAs(self, browser, 'reviewer1')
     >>> browser.open(self.board.absolute_url())
     >>> browser.getLink('Forum 1').click()
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
     >>> browser.getLink('Subscribe').click()
 
-There is yet one forum as key
-    >>> len(self.portal.portal_pbnotification.subscribers.keys())
-    1
+There are still one forum as key and now one conv
+    >>> tool.subscribers.has_key(tool.getObjId(self.forum))
+    True
+    >>> tool.subscribers.has_key(tool.getObjId(conversation))
+    True
 
-There is one member as value
-    >>> len(self.portal.portal_pbnotification.subscribers.values()[0])
-    3
+There is one subscriber for the forum and 2 for the conversation
+    >>> len(tool.subscribers[tool.getObjId(self.forum)])
+    1
+    >>> len(tool.subscribers[tool.getObjId(conversation)])
+    2
 
 Setting template
 ----------------
 
-    >>> self.portal.portal_pbnotification.html_format
+    >>> tool.html_format
     True
 
     >>> new_mail_template = """Dear John:<br />
@@ -344,8 +361,8 @@ Setting template
     ... Yours sincerely,<br />
     ... Webmaster<br />""".split('\n')
 
-    >>> self.portal.portal_pbnotification.manage_changeProperties(mail_template=new_mail_template)
-    >>> new_mail_template == list(self.portal.portal_pbnotification.getProperty('mail_template'))
+    >>> tool.manage_changeProperties(mail_template=new_mail_template)
+    >>> new_mail_template == list(tool.getProperty('mail_template'))
     True
 
 Add a reply as member2
@@ -391,3 +408,118 @@ Checking static parts of the mail
 
     >>> self.portal.MailHost.reset()
 
+Testing multiple comments mail for multiple users
+=================================================
+
+Some settings
+    >>> tool.send_interval = 300
+    >>> tool.auto_subscribe = True
+
+Add 2 replies as member2
+------------------------
+
+    >>> utils.logoutThenLoginAs(self, browser, 'member2')
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
+    >>> browser.getControl(name='text').value = 'A quick reply on conv1, part1'
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(conversation.absolute_url())
+    True
+    >>> browser.contents
+    '...A quick reply on conv1, part1...'
+    >>> browser.getControl(name='text').value = 'A quick reply on conv1, part2'
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(conversation.absolute_url())
+    True
+    >>> browser.contents
+    '...A quick reply on conv1, part2...'
+
+This shouldn't have triggered a notification because the send interval.
+-----------------------------------------------------------------------
+
+    >>> len(self.portal.MailHost.messages)
+    0
+
+Add a new conversation as member1
+----------------------------------
+
+    >>> utils.logoutThenLoginAs(self, browser, 'member1')
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.getControl('Start a new Conversation').click()
+    >>> browser.url
+    '.../add_conversation_form...'
+    >>> browser.getControl('Title').value = 'Conversation2'
+    >>> browser.getControl('Body text').value = 'Some <b>body</b> text'
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(self.forum.absolute_url())
+    True
+
+Keep time to update catalog correctly. Without conversation2 isn't the first one
+    >>> import time; time.sleep(1)
+    >>> conversation2 = self.forum.getConversations()[0]
+    >>> conversation2.Title()
+    'Conversation2'
+
+    >>> import re
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation2.getId())).click()
+
+Add a reply as member2
+----------------------
+
+    >>> utils.logoutThenLoginAs(self, browser, 'member2')
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation2.getId())).click()
+    >>> browser.getControl(name='text').value = 'A quick reply on conv2, part1'
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(conversation2.absolute_url())
+    True
+    >>> browser.contents
+    '...A quick reply on conv2, part1...'
+    >>> browser.getControl(name='text').value = 'A quick reply on conv2, part2'
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(conversation2.absolute_url())
+    True
+    >>> browser.contents
+    '...A quick reply on conv2, part2...'
+
+Some checks before testing results
+----------------------------------
+
+    >>> len(self.portal.MailHost.messages)
+    0
+
+There are still one forum as key and now two conv
+    >>> len(tool.subscribers.keys())
+    3
+    >>> tool.subscribers.has_key(tool.getObjId(self.forum))
+    True
+    >>> tool.subscribers.has_key(tool.getObjId(conversation))
+    True
+    >>> tool.subscribers.has_key(tool.getObjId(conversation2))
+    True
+
+Check subscribers number
+    >>> len(tool.subscribers[tool.getObjId(self.forum)])
+    1
+    >>> len(tool.subscribers[tool.getObjId(conversation)])
+    3
+    >>> len(tool.subscribers[tool.getObjId(conversation2)])
+    2
+
+Force the tool
+--------------
+
+Number of pending comments: 2 conv1 replies, one new conv, 2 conv2 replies
+    >>> len(tool.pending)
+    5
+    >>> tool.process_pending()
+
+This should have triggered a notification. Check the MockMailHost
+------------------------------------------------------------------
+
+!! Notification for multiple conversations and comment cannot be tested because pending objects lost acquisition during test!
+    >>> len(self.portal.MailHost.messages)
+    1

@@ -133,10 +133,14 @@ page after logging in.
             conv = obj.getConversation()
             self.addSubscriber(conv, memberid)
 
-        self.pending.append(obj)
+        self.pending.append(self.getObjId(obj))
         now = int(time())
+        #! This method insn't the best.
+        #! It should be better to use Products.cron4plone to send more regularly
         if self.last_sent and (now - self.last_sent) < self.send_interval:
             return
+        #! When treating pending objects, current user can have Unauthorized exception when accessing unauthorized objects.
+        #! We don't manage that a recent subscriber could receive a comment posted before he subscribes (when responding at this comment by example)
         self.process_pending()
         self.last_sent = now
         self.pending = PersistentList()
@@ -146,7 +150,8 @@ page after logging in.
         notify = {}
         conversations = {}
         portal_path = getToolByName(self, 'portal_url').getPortalPath()
-        for obj in self.pending:
+        for obj_full_id in self.pending:
+            obj = self.unrestrictedTraverse(obj_full_id)
             creator = obj.Creator()
             conv = obj.getConversation()
             if not conv:
@@ -162,45 +167,40 @@ page after logging in.
                 conversations[conv_id]['id'] = conv_id
                 conversations[conv_id]['forum'] = forum
                 conversations[conv_id]['cmts'] = []
-            conversations[conv_id]['cmts'].append(obj)
 
-            if forum_id in self.subscribers:
-                for n1 in self.subscribers[forum_id]:
-                    if n1 == creator:
-                        continue
-                    if n1 not in notify:
-                        notify[n1] = []
-                    if conv_id not in notify[n1]:
-                        notify[n1].append(conv_id)
-            if conv_full_id in self.subscribers:
-                for n1 in self.subscribers[conv_full_id]:
-                    if n1 == creator:
-                        continue
-                    if n1 not in notify:
-                        notify[n1] = []
-                    if conv_id not in notify[n1]:
-                        notify[n1].append(conv_id)
+            for path in (forum_id, conv_full_id):
+                if path in self.subscribers:
+                    for n1 in self.subscribers[path]:
+                        if n1 == creator:
+                            continue
+                        if n1 not in notify:
+                            notify[n1] = {'convs':[], 'cmts':{}}
+                        if conv_id not in notify[n1]['convs']:
+                            notify[n1]['convs'].append(conv_id)
+                            notify[n1]['cmts'][conv_id] = []
+                        if obj not in notify[n1]['cmts'][conv_id]:
+                            notify[n1]['cmts'][conv_id].append(obj)
 
         messages = {}
         for n1 in notify:
             email, fullname = self.getEmailAddress(n1)
             if email:
                 # we make the message only one time for each conversations combination
-                key = ','.join(notify[n1])
+                key = ','.join(['%s-%s'%(cnv,'-'.join([com.getId() for com in notify[n1]['cmts'][cnv]])) for cnv in notify[n1]['convs']])
                 if not messages.has_key(key):
                     messages[key] = self.createMessage(notify[n1], conversations)
                 self.sendNotification(email, fullname, messages[key])
 
         del notify, conversations, messages
 
-    def createMessage(self, conv_ids, conversations):
+    def createMessage(self, rel_convs, conversations):
         """Return email addresses of ``user``."""
         portal = getToolByName(self, 'portal_url').getPortalObject()
         portal_title = portal.getProperty('title').split(':')[0]        
 
         def formatUrls(with_forum=False, with_comment=False):
             urls = ''
-            for conv_id in conv_ids:
+            for conv_id in rel_convs['convs']:
                 convd = conversations[conv_id]
                 title = convd['conv'].Title()
                 if with_forum:
@@ -211,7 +211,7 @@ page after logging in.
                     urls += '%s%s\n' % (portal.absolute_url(), conv_id)
                 if with_comment:
                     comments = ''
-                    for comment in convd['cmts']:
+                    for comment in rel_convs['cmts'][conv_id]:
                         creatorinfo = portal.portal_membership.getMemberInfo(comment.Creator())
                         comments += '<li style="padding-left:2em;"><strong>%s %s %s %s</strong><br />\n'%(translate('posted_by', 'ploneboard', context=self.REQUEST, default='Posted by').encode('utf8'), creatorinfo is not None and creatorinfo['fullname'] or comment.Creator(), translate('text_at', 'ploneboard', context=self.REQUEST, default='at').encode('utf8'), ulocalized_time(comment.creation_date, long_format=True, context=self, request=self.REQUEST).encode('utf8'))
                         comments += '%s\n</li>\n'%comment.getText()

@@ -4,8 +4,14 @@ Changelog
 0.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fix sending mail with the default mailer (SecureMailHost)
+  [pbauer]
 
+- Add german translations
+  [pbauer]
+  
+- Allow styling of subscribe-link
+  [pbauer]
 
 0.5 (2012-04-16)
 ----------------

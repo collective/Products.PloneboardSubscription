@@ -183,8 +183,9 @@ page after logging in.
 
         messages = {}
         for n1 in notify:
-            email, fullname = self.getEmailAddress(n1)
-            if email:
+            recipientDetails = self.getEmailAddress(n1)
+            if recipientDetails:
+                email, fullname = recipientDetails
                 # we make the message only one time for each conversations combination
                 key = ','.join(['%s-%s'%(cnv,'-'.join([com.getId() for com in notify[n1]['cmts'][cnv]])) for cnv in notify[n1]['convs']])
                 if not messages.has_key(key):
@@ -238,14 +239,23 @@ page after logging in.
 
         - remove bogus e-mail addresses.
         """
+
         mtool = getToolByName(self, 'portal_membership')
         member = mtool.getMemberById(str(user))
         if member is not None:
-            user = member.getProperty('email', '')
+            memberEmail = member.getProperty('email', None)
             fullname = member.getProperty('fullname', '')
-            if user and EMAIL_REGEXP.match(user):
-                return user, fullname
-        return None
+        else:
+            memberEmail = None
+            fullname = ''
+
+        email = memberEmail or str(user)
+
+        if email and EMAIL_REGEXP.match(email):
+            return email, fullname
+        else:
+            return None
+
 
     def sendNotification(self, address, fullname, message):
         """Send ``message`` to all ``addresses``."""

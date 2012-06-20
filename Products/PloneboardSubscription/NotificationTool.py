@@ -254,7 +254,7 @@ page after logging in.
         if email and EMAIL_REGEXP.match(email):
             return email, fullname
         else:
-            return None
+            return None, fullname
 
 
     def sendNotification(self, address, fullname, message):

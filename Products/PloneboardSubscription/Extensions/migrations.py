@@ -39,10 +39,14 @@ def subscribe_comment_owner(self):
     for r in results :
         conv = r.getObject()
         conv_id = pbn.getObjId(conv)
+        new_subs = []
         for com in conv.getComments():
             if conv_id not in pbn.subscribers:
                 pbn.subscribers[conv_id] = PersistentList()
             creator = com.Creator().decode('utf8')
             if creator not in pbn.subscribers[conv_id]:
+                new_subs.append(creator)
                 pbn.subscribers[conv_id].append(creator)
+        if new_subs:
+            out.append("Subscribers '%s added in conversation '%s'"%(','.join(new_subs), '/'.join(conv.getPhysicalPath())))
     return "\n".join(out)

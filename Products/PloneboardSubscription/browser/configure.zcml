@@ -6,6 +6,29 @@
 
 <browser:viewlet
    name="plone.abovecontenttitle.documentactions"
+   for="Products.Ploneboard.content.Ploneboard.Ploneboard"
+   manager="plone.app.layout.viewlets.interfaces.IAboveContentTitle"
+   template="subscribers.pt"
+   permission="zope2.View"
+  />
+
+<browser:page
+    for="*"
+    name="list_subscribers"
+    class=".views.SubscriberList"
+    permission="zope2.View"
+    />
+
+<browser:viewlet
+   name="plone.abovecontenttitle.documentactions"
+   for="Products.Ploneboard.content.Ploneboard.Ploneboard"
+   manager="plone.app.layout.viewlets.interfaces.IAboveContentTitle"
+   class=".views.SubscriberList"
+   permission="zope2.View"
+  />
+
+<browser:viewlet
+   name="plone.abovecontenttitle.documentactions"
    for="Products.Ploneboard.content.PloneboardConversation.PloneboardConversation"
    manager="plone.app.layout.viewlets.interfaces.IAboveContentTitle"
    template="subscribe.pt"

@@ -187,6 +187,8 @@ page after logging in.
             if recipientDetails:
                 email, fullname = recipientDetails
                 # we make the message only one time for each conversations combination
+                if not email:
+                    continue
                 key = ','.join(['%s-%s'%(cnv,'-'.join([com.getId() for com in notify[n1]['cmts'][cnv]])) for cnv in notify[n1]['convs']])
                 if not messages.has_key(key):
                     messages[key] = self.createMessage(notify[n1], conversations)

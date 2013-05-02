@@ -8,22 +8,15 @@
    name="plone.abovecontenttitle.documentactions"
    for="Products.Ploneboard.content.Ploneboard.Ploneboard"
    manager="plone.app.layout.viewlets.interfaces.IAboveContentTitle"
-   template="subscribers.pt"
-   permission="zope2.View"
+   class=".views.SubscriberCheck"
+   permission="cmf.ManagePortal"
   />
-
-<browser:page
-    for="*"
-    name="list_subscribers"
-    class=".views.SubscriberList"
-    permission="zope2.View"
-    />
 
 <browser:viewlet
    name="plone.abovecontenttitle.documentactions"
-   for="Products.Ploneboard.content.Ploneboard.Ploneboard"
+   for="Products.Ploneboard.content.PloneboardForum.PloneboardForum"
    manager="plone.app.layout.viewlets.interfaces.IAboveContentTitle"
-   class=".views.SubscriberList"
+   class=".views.SubscriberCheck"
    permission="zope2.View"
   />
 
@@ -31,17 +24,16 @@
    name="plone.abovecontenttitle.documentactions"
    for="Products.Ploneboard.content.PloneboardConversation.PloneboardConversation"
    manager="plone.app.layout.viewlets.interfaces.IAboveContentTitle"
-   template="subscribe.pt"
+   class=".views.SubscriberCheck"
    permission="zope2.View"
   />
 
-<browser:viewlet
-   name="plone.abovecontenttitle.documentactions"
-   for="Products.Ploneboard.content.PloneboardForum.PloneboardForum"
-   manager="plone.app.layout.viewlets.interfaces.IAboveContentTitle"
-   template="subscribe.pt"
-   permission="zope2.View"
-  />
+<browser:page
+    for="*"
+    name="list_subscribers"
+    class=".views.SubscriberList"
+    permission="cmf.ManagePortal"
+    />
 
 <browser:viewlet
    name="plone.abovecontenttitle.documentactions"

@@ -40,10 +40,14 @@ class SubscriberCheck(ViewletBase):
         return False
 
     def render(self):
-        if self.has_any():
-            sub = '<a target="_blank" href="%s/list_subscribers">Show Subscribers</a>' % self.context.absolute_url()
-        else:
-            sub = 'No Subscribers'
+        checkPermission = self.context.portal_membership.checkPermission
+        can_list_subscribers = checkPermission('Manage Portal', self.context)
+        sub = ''
+        if can_list_subscribers:
+            if self.has_any():
+                sub = '<a target="_blank" href="%s/list_subscribers">Show Subscribers</a>' % self.context.absolute_url()
+            else:
+                sub = 'No Subscribers'
         if self.context.meta_type in ['PloneboardForum', 'PloneboardConversation']:
             return sub + self.template()
         else:

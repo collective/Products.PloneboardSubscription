@@ -68,7 +68,7 @@ Check the tool
         '/plone/board1/forum1'
 
     >>> self.portal.portal_pbnotification.subscribers.values()[0]
-        [u'member1']
+        ['member1']
 
 Add a new conversation
 ----------------------

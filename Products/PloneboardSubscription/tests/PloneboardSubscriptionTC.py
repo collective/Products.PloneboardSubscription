@@ -33,5 +33,4 @@ class FunctionalTestCase(PloneTestCase.FunctionalTestCase):
         if not isinstance(mailhost, MockMailHost):
             from collective.MockMailHost.setuphandlers import replace_mailhost
             replace_mailhost(self.portal)
-            print "REPLACING MAILHOST\n"
         self.portal.portal_pbnotification.send_interval = 0

@@ -68,7 +68,7 @@ There is one member as value
     >>> len(tool.subscribers[tool.getObjId(self.forum)])
     1
     >>> Set(tool.subscribers[tool.getObjId(self.forum)])
-    Set([u'member1'])
+    Set(['member1'])
 
 Add a new conversation as member2
 ----------------------------------
@@ -335,6 +335,8 @@ Subscribing other users
     >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
     >>> browser.getLink('Subscribe').click()
 
+browser.getLink('Subscribe').click()
+
 There are still one forum as key and now one conv
     >>> tool.subscribers.has_key(tool.getObjId(self.forum))
     True
@@ -343,9 +345,9 @@ There are still one forum as key and now one conv
 
 There is one subscriber for the forum and 2 for the conversation
     >>> Set(tool.subscribers[tool.getObjId(self.forum)])
-    Set([u'member1'])
+    Set(['member1'])
     >>> Set(tool.subscribers[tool.getObjId(conversation)])
-    Set([u'reviewer1', u'manager1'])
+    Set(['reviewer1', 'manager1'])
 
 Setting template
 ----------------
@@ -503,11 +505,11 @@ There are still one forum as key and now two conv
 
 Check subscribers
     >>> Set(tool.subscribers[tool.getObjId(self.forum)])
-    Set([u'member1'])
+    Set(['member1'])
     >>> Set(tool.subscribers[tool.getObjId(conversation)])
-    Set([u'reviewer1', u'manager1', u'member2'])
+    Set(['reviewer1', 'manager1', 'member2'])
     >>> Set(tool.subscribers[tool.getObjId(conversation2)])
-    Set([u'member1', u'member2'])
+    Set(['member1', 'member2'])
 
 Force the tool
 --------------

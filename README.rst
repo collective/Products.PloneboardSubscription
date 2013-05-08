@@ -1,12 +1,12 @@
 Description
 ===========
 
-.. image:: https://pypip.in/v/$REPO/badge.png
-    :target: https://crate.io/packages/$REPO/
+.. image:: https://pypip.in/v/Products.PloneboardSubscription/badge.png
+    :target: https://crate.io/packages/Products.PloneboardSubscription/
     :alt: Latest PyPI version
 
-.. image:: https://pypip.in/d/$REPO/badge.png
-    :target: https://crate.io/packages/$REPO/
+.. image:: https://pypip.in/d/Products.PloneboardSubscription/badge.png
+    :target: https://crate.io/packages/Products.PloneboardSubscription/
     :alt: Number of PyPI downloads
 
 Products.PloneboardSubscription enables users to subscribe/unsubscribe to email

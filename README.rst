@@ -1,6 +1,14 @@
 Description
 ===========
 
+.. image:: https://pypip.in/v/$REPO/badge.png
+    :target: https://crate.io/packages/$REPO/
+    :alt: Latest PyPI version
+
+.. image:: https://pypip.in/d/$REPO/badge.png
+    :target: https://crate.io/packages/$REPO/
+    :alt: Number of PyPI downloads
+
 Products.PloneboardSubscription enables users to subscribe/unsubscribe to email
 notification to a Ploneboard forum or a particular conversation,
 

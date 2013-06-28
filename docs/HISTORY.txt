@@ -4,13 +4,13 @@ Changelog
 0.9 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added CREDITS [sureshvv]
 
 
 0.8 (2013-06-28)
 ----------------
 
-- Fix manifests [sureshvv]
+- Fix manifest [sureshvv]
 
 
 0.7 (2013-05-07)
@@ -43,13 +43,15 @@ Changelog
 0.4 (2012-04-16)
 ----------------
 
-- Removed dependency on PasteScript. Seems to go on an infinite loop downloading PasteScript while install.
+- Removed dependency on PasteScript. Seems to go on an infinite loop
+  downloading PasteScript while install.
 
 
 0.3 (2012-04-15)
 ----------------
 
-- Auto subscribe option : a user adding a comment will be added in the subscribers list for the corresponding conversation. (Stéphan Geulette)
+- Auto subscribe option : a user adding a comment will be added in the subscribers
+  list for the corresponding conversation. (Stéphan Geulette)
 - Html email option : the mail can be sent in html format (Stéphan Geulette)
 - Email can contains different information levels (Stéphan Geulette)
 

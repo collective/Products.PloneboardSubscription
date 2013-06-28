@@ -10,7 +10,7 @@ Changelog
 0.8 (2013-06-28)
 ----------------
 
-- Nothing changed yet.
+- Fix manifests [sureshvv]
 
 
 0.7 (2013-05-07)

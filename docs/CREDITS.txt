@@ -1,0 +1,6 @@
+Products.PloneboardSubscription originally sponsored by Marshall Mayer,
+for use by the Livemodern website (http://www.livemodern.com).
+
+List Subscribers functionality sponsored by the SAX Institute
+(https://www.saxinstitute.org.au)
+

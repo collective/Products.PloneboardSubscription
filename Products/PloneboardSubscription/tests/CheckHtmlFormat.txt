@@ -1,0 +1,145 @@
+Test for mail template
+======================
+
+Checking MockMailHost
+
+    >>> self.portal.MailHost
+    <MockMailHost at ...>
+
+Test starting conversations, replying and modifying comments in a default
+member-posting forum.
+
+First, some set-up:
+
+    >>> from Products.Five import zcml
+    >>> import Products
+    >>> zcml.load_config('configure.zcml', package=Products.PloneboardSubscription)
+    >>> import Products.PloneboardSubscription
+    >>> zcml.load_config('configure.zcml', package=Products.PloneboardSubscription.browser)
+
+    >>> from Products.Ploneboard.tests import utils
+    >>> utils.setUpDefaultMembersBoardAndForum(self)
+
+    >>> new_mail_template = """Dear John:
+    ... This is a notification of [PORTAL_TITLE].
+    ...
+    ... [URLS]
+    ...
+    ... Your url is in the mail.
+    ... Thanks.
+    ...
+    ... Yours sincerely,
+    ... Webmaster""".split('\n')
+
+    >>> tool = self.portal.portal_pbnotification
+    >>> tool.manage_changeProperties(mail_template=new_mail_template)
+    >>> new_mail_template == list(tool.getProperty('mail_template'))
+    True
+
+    >>> browser = self.browser
+    >>> utils.logoutThenLoginAs(self, browser, 'member1')
+
+View forum
+----------
+
+The forum created behind the scenes should now be shown here.
+
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.contents
+    '...Forum 1...'
+
+If we go to the forum, there are no conversations shown.
+
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.contents
+    '...No conversations in this forum yet...'
+
+Look for Subscribe link
+-----------------------
+
+    >>> browser.getLink('Subscribe').click()
+
+There is now one forum as key
+    >>> tool.subscribers.has_key(tool.getObjId(self.forum))
+    True
+
+There is one member as value
+    >>> from sets import Set
+    >>> len(tool.subscribers[tool.getObjId(self.forum)])
+    1
+    >>> Set(tool.subscribers[tool.getObjId(self.forum)])
+    Set(['member1'])
+
+Add a new conversation as member2
+----------------------------------
+
+Now we can add a new conversation. We set a title and some body text. The body
+text can contain HTML as well.
+
+    >>> utils.logoutThenLoginAs(self, browser, 'member2')
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.getControl('Start a new Conversation').click()
+    >>> browser.url
+    '.../add_conversation_form...'
+    >>> browser.getControl('Title').value = 'Conversation1'
+    >>> browser.getControl('Body text').value = 'Some <b>body</b> text'
+
+Submit the form, and we should be returned to the forum view. The conversation
+should exist, and we should be able to view it.
+
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(self.forum.absolute_url())
+    True
+    >>> conversation = self.forum.getConversations()[0]
+
+    >>> import re
+    >>> browser.getLink(url=re.compile('\/%s$' % conversation.getId())).click()
+
+This should have triggered a notification. Check the MockMailHost
+------------------------------------------------------------------
+
+    >>> len(self.portal.MailHost.messages)
+        1
+
+    >>> tool.html_format
+    False
+
+    >>> tool.manage_changeProperties(html_format=True)
+    >>> tool.html_format
+    True
+
+Add another conversation
+------------------------
+
+    >>> browser.open(self.board.absolute_url())
+    >>> browser.getLink('Forum 1').click()
+    >>> browser.getControl('Start a new Conversation').click()
+    >>> browser.url
+    '.../add_conversation_form...'
+    >>> browser.getControl('Title').value = 'Conversation2'
+    >>> browser.getControl('Body text').value = 'Another <i>body</i> text'
+
+Submit the form, and we should be returned to the forum view. The conversation
+should exist, and we should be able to view it.
+
+    >>> browser.getControl(name='form.button.Post').click()
+    >>> browser.url.startswith(self.forum.absolute_url())
+    True
+
+This should have triggered a notification. Check the MockMailHost
+------------------------------------------------------------------
+    >>> len(self.portal.MailHost.messages)
+        2
+
+    >>> self.portal.MailHost.msg_types[0]
+    'text/plain'
+
+    >>> self.portal.MailHost.msg_types[1]
+    'text/html'
+
+    >>> self.portal.MailHost.messages[0]
+    'From:...'
+
+    self.portal.MailHost.msg_types[1]
+    'text/html'

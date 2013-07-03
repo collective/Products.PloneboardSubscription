@@ -5,6 +5,7 @@ Changelog
 ----------------
 
 - Added CREDITS [sureshvv]
+- HTML format email broken [sureshvv]
 
 
 0.8 (2013-06-28)

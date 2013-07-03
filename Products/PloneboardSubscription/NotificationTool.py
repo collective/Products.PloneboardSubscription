@@ -293,7 +293,7 @@ Subject: %s Forum Notification
         if self.html_format:
             msg_type = 'text/html'
         try:
-            mailhost.send(this_message)
+            mailhost.send(this_message, msg_type=msg_type)
             n_messages_sent += 1
         except ConflictError:
             raise

@@ -3,6 +3,8 @@ import os
 
 version = '0.9.dev0'
 
+tests_require = [ 'collective.MockMailHost' ]
+
 setup(name='Products.PloneboardSubscription',
       version=version,
       description="Enables email subscription to Ploneboard posts",
@@ -27,6 +29,8 @@ setup(name='Products.PloneboardSubscription',
           'setuptools',
           # -*- Extra requirements: -*-
       ],
+      tests_require = tests_require,
+      extras_require={'test': tests_require},
       entry_points="""
       # -*- Entry points: -*-
 

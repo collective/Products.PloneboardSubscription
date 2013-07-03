@@ -19,9 +19,14 @@ OPTIONFLAGS = (doctest.REPORT_ONLY_FIRST_FAILURE |
                doctest.ELLIPSIS |
                doctest.NORMALIZE_WHITESPACE)
 
-test_files_in_order = [ 'MemberSubscribesToForum.txt',
+do_not_test = [
+              ]
+
+test_files_in_order = [
+                        'MemberSubscribesToForum.txt',
                         'MemberSubscribesToConv.txt',
                         'CheckMailTemplate.txt',
+                        'CheckHtmlFormat.txt',
                       ]
 
 def list_doctests():

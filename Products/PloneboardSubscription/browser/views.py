@@ -40,6 +40,9 @@ class SubscriberCheck(ViewletBase):
         return False
 
     def render(self):
+        tool = getToolByName(self.context, ID, None)
+        if not tool:
+            return '<div>HELPME</div>'
         checkPermission = self.context.portal_membership.checkPermission
         can_list_subscribers = checkPermission('Manage Portal', self.context)
         sub = ''

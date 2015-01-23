@@ -251,7 +251,7 @@ page after logging in.
             memberEmail = None
             fullname = ''
 
-        email = memberEmail or str(user)
+        email = memberEmail
 
         if email and EMAIL_REGEXP.match(email):
             return email, fullname

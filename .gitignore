@@ -1,3 +1,9 @@
 *.mo
 *.pyc
 Products.PloneboardSubscription.egg-info
+.installed.cfg
+bin/
+buildout-cache/
+develop-eggs/
+eggs/
+parts/

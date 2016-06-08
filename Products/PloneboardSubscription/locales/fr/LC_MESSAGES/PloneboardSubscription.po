@@ -22,4 +22,4 @@ msgid "Unsubscribe"
 msgstr "Se désabonner"
 
 msgid "default_mail_template"
-msgstr "Cher membre du [PORTAL_TITLE]:\n\nVous avez souscrits à certaines conversations qui viennent d'évoluer.\nVous pouvez suivre les liens suivants pour visualiser ces messages:\n\n[URLS]\n\nNote: si vous ne désirez plus recevoir de notifications pour ces conversations, vous pouvez cliquez sur le lien 'Se désabonner' situé sur la page d'une conversation ou d'un forum.\n"
+msgstr "Cher membre du [PORTAL_TITLE],\n\nvous êtes abonné à certaines conversations qui viennent d'être mises à jour.\nVous pouvez suivre les liens suivants pour les visualiser :\n\n[URLS]\n\nNote : si vous souhaitez ne plus recevoir de notifications pour ces conversations, vous pouvez cliquer sur le lien « Se désabonner » situé sur la page d'une conversation ou d'un forum.\n"

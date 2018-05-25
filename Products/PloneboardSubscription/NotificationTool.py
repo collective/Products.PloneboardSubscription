@@ -280,7 +280,7 @@ page after logging in.
 To: %s <%s>
 Subject: %s Forum Notification
 %s
-""" % (email_from_name, email_from_address, fullname.decode(encoding), address, portal_title.decode(encoding), message.decode(encoding))
+""" % (email_from_name.decode(encoding), email_from_address, fullname.decode(encoding), address, portal_title.decode(encoding), message.decode(encoding))
         this_message = self.encodeMailHeaders(this_message, encoding)
         this_message = this_message.encode(encoding)
 
